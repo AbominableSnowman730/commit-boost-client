@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "commit-boost.fullname" . }}-sidecar
+  labels:
+    {{- include "commit-boost.labels" . | nindent 4 }}
+    app.kubernetes.io/component: sidecar
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "commit-boost.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: sidecar
+  template:
+    metadata:
+      labels:
+        {{- include "commit-boost.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: sidecar
+    spec:
+      serviceAccountName: {{ include "commit-boost.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}-sidecar
+          image: "{{ .Values.sidecar.image.repository }}:{{ .Values.sidecar.image.tag }}"
+          imagePullPolicy: Always
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+          volumeMounts:
+            - name: app-data
+              mountPath: /app
+            - name: config
+              mountPath: /tmp/config
+          env:
+            - name: RUST_LOG
+              value: "debug"
+            - name: RUST_BACKTRACE
+              value: "1"
+            - name: CARGO_MANIFEST_DIR
+              value: "/app"
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Starting with config:"
+              cat /app/is-config.toml
+              echo "Directory contents:"
+              ls -la /app
+              /interstate-boost
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      volumes:
+        - name: app-data
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: {{ include "commit-boost.fullname" . }}-sidecar-config
