@@ -29,7 +29,7 @@ spec:
             - name: app-data
               mountPath: /app
             - name: config
-              mountPath: /tmp/config
+              mountPath: /app/is-config.toml
           env:
             - name: RUST_LOG
               value: "debug"
