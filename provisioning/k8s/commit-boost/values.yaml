@@ -126,7 +126,7 @@ commitBoost:
 sidecar:
   replicaCount: 1
   image:
-    repository: atrey23/interstate-boost
+    repository: interstatecrypto/interstate-sidecar
     tag: "latest"
     pullPolicy: Always
   service:
@@ -141,35 +141,3 @@ sidecar:
       cpu: 250m
       memory: 256Mi
   replicaCount: 1
-  image:
-    repository: interstatecrypto/interstate-cb-module
-    tag: "latest"
-    pullPolicy: Always  # Changed to Always to ensure we get the latest image
-  service:
-    type: ClusterIP
-    rpcPort: 9061
-    metricsPort: 9062
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 1Gi
-    requests:
-      cpu: 500m
-      memory: 512Mi
-  replicaCount: 1
-  image:
-    repository: interstatecrypto/interstate-sidecar
-    tag: "latest"
-    pullPolicy: IfNotPresent
-  service:
-    type: ClusterIP
-    rpcPort: 9061
-    metricsPort: 9062
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 1Gi
-    requests:
-      cpu: 500m
-      memory: 512Mi
-
